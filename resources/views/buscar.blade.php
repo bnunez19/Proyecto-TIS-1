@@ -87,7 +87,7 @@
 
                             <p class="mb-0">
                                 <span class="fw-semibold">Link:</span>
-                                <a href="{{$r->link_receta}}">{{$r->link_receta}}</a>
+                                <p>Link: <a href="/mostrar/{{ $r->id_receta }}">{{ $r->nombre_receta }}</a></p>
                             </p>
                         </div>
                     </div>
