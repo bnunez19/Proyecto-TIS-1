@@ -2,111 +2,182 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Ingresar receta</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"> / */
+    {{-- R1.22: los campos con error se marcan en rojo --}}
+    <style>
+        .rojo { border: 2px solid red; }
+    </style>
 </head>
-<body class="bg-light">
-<div class="container py-4">
+<body>
+    <h1>Ingresar receta</h1>
 
-    <h1 class="mb-4">Ingresar receta</h1>
-
-    @if (session('exito'))
-        <div class="alert alert-success">{{ session('exito') }}</div>
-    @endif
-
+    {{-- R1.22 y Salida 2: busca y muestra los mensajes de error (sin repetir los iguales) --}}
     @if ($errors->any())
-        <div class="alert alert-danger">
-            @foreach ($errors->all() as $error)
-                <div>{{ $error }}</div>
-            @endforeach
-        </div>
+        @foreach (collect($errors->all())->unique() as $error)
+            <p style="color: red;">{{$error}}</p>
+        @endforeach
     @endif
 
-    <form action="{{ route('ingreso.guardar') }}" method="POST" class="card card-body">
+    {{-- formulario: los datos se envian a la ruta ingreso.guardar y asi de esa forma la receta se guarda
+         enctype multipart: se usa para enviar la imagen como archivo (R1.7)
+         novalidate: los mensajes de error los entrega el sistema y no el navegador (R1.22) --}}
+
+    <form method="POST" action="{{route('ingreso.guardar')}}" enctype="multipart/form-data" novalidate>
         @csrf
 
-        <div class="mb-3">
-            <label class="form-label">Nombre de la receta</label>
-            <input type="text" name="nombre_receta" class="form-control" maxlength="60" value="{{ old('nombre_receta') }}">
-        </div>
+        {{-- R1.2 y R1.15: nombre de la receta --}}
+        <p>
+            <label for="nombre_receta">Nombre de la receta:</label>
+            <input type="text" id="nombre_receta" name="nombre_receta" value="{{old('nombre_receta')}}"
+                   class="{{ $errors->has('nombre_receta') ? 'rojo' : '' }}">
+        </p>
 
-        <div class="mb-3">
-            <label class="form-label">Descripción </label>
-            <input type="text" name="descripcion_corta" class="form-control" maxlength="150" value="{{ old('descripcion_corta') }}">
-        </div>
+        {{-- R1.3 y R1.15: descripcion corta --}}
+        <p>
+            <label for="descripcion_corta">Descripción corta:</label>
+            <input type="text" id="descripcion_corta" name="descripcion_corta" value="{{old('descripcion_corta')}}"
+                   class="{{ $errors->has('descripcion_corta') ? 'rojo' : '' }}">
+        </p>
 
-        <div class="mb-3">
-            <label class="form-label">Imagen referencial (enlace)</label>
-            <input type="url" name="imagen_referencial" class="form-control" placeholder="https://..." value="{{ old('imagen_referencial') }}">
-        </div>
+        {{-- R1.7, R1.15 y R1.19: la imagen es un archivo adjunto JPG, JPEG o PNG
+             (despues de un error hay que volver a elegirla, el navegador no la conserva) --}}
+        <p>
+            <label for="imagen_referencial">Imagen referencial (JPG o PNG):</label>
+            <input type="file" id="imagen_referencial" name="imagen_referencial" accept=".jpg,.jpeg,.png"
+                   class="{{ $errors->has('imagen_referencial') ? 'rojo' : '' }}">
+        </p>
 
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label class="form-label">Cantidad de personas</label>
-                <input type="number" name="cant_personas" class="form-control" min="1" max="50" value="{{ old('cant_personas') }}">
-            </div>
-            <div class="col-md-8 mb-3">
-                <label class="form-label">Tipo de plato</label>
-                <select name="categoria" class="form-select">
-                    <option value="">Seleccione...</option>
-                    @foreach (['Entrada', 'Plato de fondo', 'Postre', 'Ensalada', 'Sopa', 'Bebestible', 'Aperitivo'] as $c)
-                        <option value="{{ $c }}" @selected(old('categoria') === $c)>{{ $c }}</option>
-                    @endforeach
-                </select>
-            </div>
-        </div>
+        {{-- R1.8 y R1.15: cantidad de personas --}}
+        <p>
+            <label for="cant_personas">Cantidad de personas:</label>
+            <input type="number" id="cant_personas" name="cant_personas" step="any" value="{{old('cant_personas')}}"
+                   class="{{ $errors->has('cant_personas') ? 'rojo' : '' }}">
+        </p>
 
-        <div class="mb-3">
-            <label class="form-label d-block">Régimen alimenticio</label>
-            @foreach (['Normal', 'Vegetariano', 'Vegano', 'Diabético', 'Celíaco', 'Hipertenso'] as $i => $reg)
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" name="regimen[]" id="reg{{ $i }}" value="{{ $reg }}"
-                           @checked(in_array($reg, (array) old('regimen', [])))>
-                    <label class="form-check-label" for="reg{{ $i }}">{{ $reg }}</label>
-                </div>
-            @endforeach
-        </div>
+        {{-- R1.9 y R1.17: categoria, lista cerrada de una sola opcion --}}
+        <p>
+            <label for="categoria">Categoría:</label>
+            <select id="categoria" name="categoria" class="{{ $errors->has('categoria') ? 'rojo' : '' }}">
+                <option value="">Seleccione</option>
+                @foreach ($categorias as $cat)
+                    <option value="{{$cat}}" @selected(old('categoria') === $cat)>{{$cat}}</option>
+                @endforeach
+            </select>
+        </p>
 
+        {{-- R1.10 y R1.17: regimen alimenticio, lista cerrada de una o mas opciones --}}
+        <p>
+            Régimen alimenticio:<br>
+            <span class="{{ $errors->has('regimen') ? 'rojo' : '' }}">
+                @foreach ($regimenes as $reg)
+                    <label>
+                        <input type="checkbox" name="regimen[]" value="{{$reg}}"
+                        @checked(in_array($reg, (array) old('regimen', [])))>
+                        {{$reg}}
+                    </label>
+                @endforeach
+            </span>
+        </p>
         <hr>
 
-        <h5>Ingredientes</h5>
-        @foreach ([0, 1, 2] as $i)
-            <div class="row g-2 mb-2">
-                <div class="col-md-6">
-                    <input type="text" name="ingredientes[{{ $i }}][nombre]" class="form-control" placeholder="Ingrediente"
-                           value="{{ old("ingredientes.$i.nombre") }}">
-                </div>
-                <div class="col-md-3">
-                    <input type="number" step="0.01" name="ingredientes[{{ $i }}][cantidad]" class="form-control" placeholder="Cantidad"
-                           value="{{ old("ingredientes.$i.cantidad") }}">
-                </div>
-                <div class="col-md-3">
-                    <select name="ingredientes[{{ $i }}][unidad]" class="form-select">
-                        <option value="">Unidad...</option>
-                        @foreach (['gramos', 'kilogramos', 'mililitros', 'litros', 'tazas', 'cucharadas', 'cucharaditas', 'unidades', 'pizca'] as $u)
-                            <option value="{{ $u }}" @selected(old("ingredientes.$i.unidad") === $u)>{{ $u }}</option>
+        {{-- R1.16: de 1 a 50 ingredientes. Cada uno con nombre (R1.4), cantidad (R1.5) y unidad (R1.6) --}}
+        <h3>Ingredientes</h3>
+        <div id="ingredientes">
+            @php $filasIng = old('ingredientes', [['nombre' => '', 'cantidad' => '', 'unidad' => '']]); @endphp
+            @foreach ($filasIng as $i => $ing)
+                <p>
+                    <input type="text" name="ingredientes[{{$i}}][nombre]" placeholder="Ingrediente"
+                           value="{{$ing['nombre'] ?? ''}}"
+                           class="{{ $errors->has("ingredientes.$i.nombre") ? 'rojo' : '' }}">
+                    <input type="number" step="any" name="ingredientes[{{$i}}][cantidad]" placeholder="Cantidad"
+                           value="{{$ing['cantidad'] ?? ''}}"
+                           class="{{ $errors->has("ingredientes.$i.cantidad") ? 'rojo' : '' }}">
+                    <select name="ingredientes[{{$i}}][unidad]" class="{{ $errors->has("ingredientes.$i.unidad") ? 'rojo' : '' }}">
+                        <option value="">Unidad</option>
+                        @foreach ($unidades as $u)
+                            <option value="{{$u}}" @selected(($ing['unidad'] ?? '') === $u)>{{$u}}</option>
                         @endforeach
                     </select>
-                </div>
-            </div>
-        @endforeach
-
+                    <button type="button" onclick="quitarFila(this, 'ingredientes')">Quitar</button>
+                </p>
+            @endforeach
+        </div>
+        <button type="button" onclick="agregarIngrediente()">Agregar ingrediente</button>
         <hr>
 
-        <h5>Pasos de preparación</h5>
-        @foreach ([0, 1, 2] as $i)
-            <div class="input-group mb-2">
-                <span class="input-group-text">{{ $i + 1 }}</span>
-                <textarea name="pasos[]" class="form-control" rows="2" maxlength="300">{{ old("pasos.$i") }}</textarea>
-            </div>
-        @endforeach
+        {{-- R1.18: de 1 a 30 pasos. La lista numerada pone el numero sola
+             (R1.12: guarda PASO_NUMERO correlativo desde 1) --}}
+        <h3>Pasos de preparación</h3>
+        <ol id="pasos">
+            @php $filasPasos = old('pasos', ['']); @endphp
+            @foreach ($filasPasos as $i => $paso)
+                <li>
+                    <textarea name="pasos[]" rows="2" cols="50"
+                              class="{{ $errors->has("pasos.$i") ? 'rojo' : '' }}">{{$paso}}</textarea>
+                    <button type="button" onclick="quitarFila(this, 'pasos')">Quitar</button>
+                </li>
+            @endforeach
+        </ol>
+        <button type="button" onclick="agregarPaso()">Agregar paso</button>
+        <hr>
 
-        <div class="mt-3">
-            <button type="submit" class="btn btn-primary">Guardar receta</button>
-        </div>
+        <button type="submit">Guardar receta</button>
     </form>
 
-</div>
+    {{-- moldes de las filas nuevas (NUEVO se reemplaza por un numero distinto en cada fila) --}}
+    <template id="molde-ingrediente">
+        <p>
+            <input type="text" name="ingredientes[NUEVO][nombre]" placeholder="Ingrediente">
+            <input type="number" step="any" name="ingredientes[NUEVO][cantidad]" placeholder="Cantidad">
+            <select name="ingredientes[NUEVO][unidad]">
+                <option value="">Unidad</option>
+                @foreach ($unidades as $u)
+                    <option value="{{$u}}">{{$u}}</option>
+                @endforeach
+            </select>
+            <button type="button" onclick="quitarFila(this, 'ingredientes')">Quitar</button>
+        </p>
+    </template>
+
+    <template id="molde-paso">
+        <li>
+            <textarea name="pasos[]" rows="2" cols="50"></textarea>
+            <button type="button" onclick="quitarFila(this, 'pasos')">Quitar</button>
+        </li>
+    </template>
+
+    <script>
+        var contador = 1000; //numero distinto para cada fila nueva de ingredientes
+
+        //R1.16: agrega una fila de ingrediente (maximo 50)
+        function agregarIngrediente() {
+            var lista = document.getElementById('ingredientes');
+            if (lista.children.length >= 50) {
+                alert('Una receta puede tener como maximo 50 ingredientes');
+                return;
+            }
+            contador++;
+            var fila = document.getElementById('molde-ingrediente').innerHTML.replace(/NUEVO/g, contador);
+            lista.insertAdjacentHTML('beforeend', fila);
+        }
+
+        //R1.18: agrega un paso (maximo 30)
+        function agregarPaso() {
+            var lista = document.getElementById('pasos');
+            if (lista.children.length >= 30) {
+                alert('Una receta puede tener como maximo 30 pasos');
+                return;
+            }
+            lista.insertAdjacentHTML('beforeend', document.getElementById('molde-paso').innerHTML);
+        }
+
+        //quita una fila, pero siempre deja al menos una (R1.16 y R1.18: minimo 1)
+        function quitarFila(boton, idLista) {
+            var lista = document.getElementById(idLista);
+            if (lista.children.length > 1) {
+                boton.parentNode.remove();
+            }
+        }
+    </script>
 </body>
 </html>
