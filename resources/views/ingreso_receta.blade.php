@@ -50,8 +50,8 @@
         {{-- R1.8 y R1.15: cantidad de personas --}}
         <p>
             <label for="cant_personas">Cantidad de personas:</label>
-            <input type="number" id="cant_personas" name="cant_personas" step="any" value="{{old('cant_personas')}}"
-                   class="{{ $errors->has('cant_personas') ? 'rojo' : '' }}">
+           <input type="number" id="cant_personas" name="cant_personas" min="1" max="50" step="1" value="{{old('cant_personas')}}"
+                    class="{{ $errors->has('cant_personas') ? 'rojo' : '' }}">
         </p>
 
         {{-- R1.9 y R1.17: categoria, lista cerrada de una sola opcion --}}
@@ -89,9 +89,9 @@
                     <input type="text" name="ingredientes[{{$i}}][nombre]" placeholder="Ingrediente"
                            value="{{$ing['nombre'] ?? ''}}"
                            class="{{ $errors->has("ingredientes.$i.nombre") ? 'rojo' : '' }}">
-                    <input type="number" step="any" name="ingredientes[{{$i}}][cantidad]" placeholder="Cantidad"
-                           value="{{$ing['cantidad'] ?? ''}}"
-                           class="{{ $errors->has("ingredientes.$i.cantidad") ? 'rojo' : '' }}">
+                    <input type="number" min="0.01" max="10000" step="0.01" name="ingredientes[{{$i}}][cantidad]" placeholder="Cantidad"
+                            value="{{$ing['cantidad'] ?? ''}}"
+                            class="{{ $errors->has("ingredientes.$i.cantidad") ? 'rojo' : '' }}">
                     <select name="ingredientes[{{$i}}][unidad]" class="{{ $errors->has("ingredientes.$i.unidad") ? 'rojo' : '' }}">
                         <option value="">Unidad</option>
                         @foreach ($unidades as $u)
@@ -128,7 +128,7 @@
     <template id="molde-ingrediente">
         <p>
             <input type="text" name="ingredientes[NUEVO][nombre]" placeholder="Ingrediente">
-            <input type="number" step="any" name="ingredientes[NUEVO][cantidad]" placeholder="Cantidad">
+            <input type="number" min="0.01" max="10000" step="0.01" name="ingredientes[NUEVO][cantidad]" placeholder="Cantidad">
             <select name="ingredientes[NUEVO][unidad]">
                 <option value="">Unidad</option>
                 @foreach ($unidades as $u)
