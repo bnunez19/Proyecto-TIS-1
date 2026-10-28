@@ -18,6 +18,7 @@ Route::get('/ingreso', [IngresoController::class, 'create'])->name('ingreso');
 Route::post('/ingreso', [IngresoController::class, 'store'])->name('ingreso.guardar');
 Route::get('/receta/{id}/{slug?}', [IngresoController::class, 'show'])->whereNumber('id')->name('receta.mostrar');
 Route::get('/buscar', [BusquedaController::class, 'index'])->name('buscar');
+
 //rutas de la pagina independiente donde se elige y guarda la valoracion
 Route::get('/valorar', [CalificacionController::class, 'index'])->name('valorar');
 Route::post('/valorar', [CalificacionController::class, 'guardar'])->name('valorar.guardar');
