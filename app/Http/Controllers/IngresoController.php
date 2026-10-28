@@ -63,7 +63,7 @@ class IngresoController extends Controller
             //R1.3 (largo 10 a 150) y R1.15 (obligatorio)
             'descripcion_corta' => ['bail', 'required', 'string', 'between:10,150'],
             //R1.7 (archivo jpg, jpeg o png, maximo 5 MB, minimo 400x400), R1.15 (obligatorio) y R1.19 (si falta, mensaje propio)
-            'imagen_referencial' => ['bail', 'required', 'file', 'mimes:jpg,jpeg,png', 'max:5120', 'dimensions:min_width=400,min_height=400'],
+            'imagen_referencial' => ['bail', 'required', 'file', 'mimes:jpg,jpeg,png', 'max:5120', 'dimensions:min_width=150,min_height=150'],
             //R1.8 (entero entre 1 y 50) y R1.15 (obligatorio)
             'cant_personas' => ['bail', 'required', 'integer', 'between:1,50'],
             //R1.9 (lista cerrada), R1.17 (obligatoria y una sola opcion)
