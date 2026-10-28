@@ -1,5 +1,13 @@
 <h1>¿que quieres hacer?</h1>
 
+<form action="/top10" method="GET">
+    <button type="submit">Top 10 recetas mas populares por categoria</button>
+</form>
+
+<form action="/ajuste-ingredientes" method="GET">
+    <button type="submit">Ajustar ingredientes de receta</button>
+</form>
+
 <form action="/ingreso" method="GET">
     <button type="submit">Ingresar nueva receta</button>
 </form>
@@ -12,11 +20,7 @@
     <button type="submit">Mostar todas las recetas</button>
 </form>
 
-<form action="/top10" method="GET">
-    <button type="submit">Top 10 recetas mas populares por categoria</button>
+<!-- abre la pagina independiente para elegir y valorar una receta -->
+<form action="/valorar" method="GET">
+    <button type="submit">Valorar receta</button>
 </form>
-
-<form action="/ajuste-ingredientes" method="GET">
-    <button type="submit">Ajustar ingredientes de receta</button>
-</form>
-

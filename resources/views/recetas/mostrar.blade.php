@@ -13,7 +13,7 @@
 <p>Descripción: {{ $recetas->descripcion_corta }}</p>
 <p>Promedio: {{ $recetas->promedio_calificacion }}</p>
 <p>Cantidad de calificaciones: {{ $recetas->cantidad_calificaciones }}</p>
-<p>Link: <a href="/mostrar/{{ $recetas->id_receta }}">{{ $recetas->nombre_receta }}</a></p>
+<p>Link: <a href="{{ route('recetas.mostrar', $recetas->id_receta) }}">{{ $recetas->nombre_receta }}</a></p>
 <h3>Regímenes</h3>
 <ul>
     @forelse ($recetas->regimenes as $reg)
@@ -23,4 +23,14 @@
     @endforelse
 </ul>
 
-<a href="/lista">Volver a la lista</a>
+
+@if (request('origen') === 'valorar')
+    <a href="{{ route('valorar', [
+        'id_usuario' => request('id_usuario'),
+        'id_receta' => $recetas->id_receta,
+    ]) }}">
+        Volver a valorar receta
+    </a>
+@else
+    <a href="{{ route('recetas.lista') }}">Volver a la lista</a>
+@endif

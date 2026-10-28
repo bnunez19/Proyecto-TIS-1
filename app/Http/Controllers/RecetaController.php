@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Receta;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
