@@ -113,14 +113,12 @@ class CalificacionController extends Controller
         return redirect()->route('valorar', ['id_usuario' => $idUsuario, 'id_receta' => $idReceta])
             ->with('exito', 'Calificación registrada exitosamente');
     }
-
     // devuelve la receta con sus regimenes o null si el id no es valido o no existe
     private function buscarReceta(string $idReceta): ?Receta
     {
         if (! ctype_digit($idReceta) || (int) $idReceta < 1 || (int) $idReceta > self::MAX_ID_RECETA) {
             return null;
         }
-
         return Receta::with('regimenes')->find((int) $idReceta);
     }
 }
