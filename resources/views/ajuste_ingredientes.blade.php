@@ -67,6 +67,8 @@
 
             <div class="mb-4" style="max-width: 300px;">
                 <label for="personas" class="form-label fw-bold">  Cantidad de personas deseada: </label>
+
+                {{-- Primera validación para que cant_personas_deseada sea un entero positivo según R4.1 en la especificación de requisitos --}}
                 <input
                     type="number"
                     id="personas"
@@ -128,7 +130,8 @@
         function ajustarIngredientes() { //ejecutamos los calculos
             const personasDeseadas = Number(personasInput.value); //obtenemos el valor dentro del elemento personasInput y lo guardamos en la variable personasDeseadas
 
-            if (personasDeseadas >= 1 && personasDeseadas <= 50 && personasOriginales > 0 && Number.isInteger(personasDeseadas)){ //nos aseguramos que se cumplan las condiciones adecuadas para personasDeseadas
+            //Otra validación extra para que personasDeseadas sea un entero positivo según R4.1 en la especificación de requisitos
+            if (personasDeseadas >= 1 && personasDeseadas <= 50 && personasOriginales > 0 && Number.isInteger(personasDeseadas)){ //nos aseguramos que personasDeseadas esté en el rando de 1-50 y sea entero 
                 
                 const factor_ajuste = personasDeseadas / personasOriginales; //calculamos el factor_ajuste
 
