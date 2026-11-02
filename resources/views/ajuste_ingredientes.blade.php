@@ -128,7 +128,7 @@
         function ajustarIngredientes() { //ejecutamos los calculos
             const personasDeseadas = Number(personasInput.value); //obtenemos el valor dentro del elemento personasInput y lo guardamos en la variable personasDeseadas
 
-            if (personasDeseadas >= 1 && personasDeseadas <= 50 && personasOriginales > 0){ //nos aseguramos que se cumplan las condiciones adecuadas para personasDeseadas
+            if (personasDeseadas >= 1 && personasDeseadas <= 50 && personasOriginales > 0 && Number.isInteger(personasDeseadas)){ //nos aseguramos que se cumplan las condiciones adecuadas para personasDeseadas
                 
                 const factor_ajuste = personasDeseadas / personasOriginales; //calculamos el factor_ajuste
 
