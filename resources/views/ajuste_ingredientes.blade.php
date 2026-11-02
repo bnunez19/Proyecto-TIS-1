@@ -13,6 +13,50 @@
     <main class="container py-4" style="max-width: 800px;">
         <div class="card shadow-sm p-4 mb-4 border-0">
             <h1 class="h3 mb-2 fw-bold">{{ $receta->nombre_receta }}</h1> {{-- encabezado --}}
+
+            <!-- selector de receta por id-->
+            <div class="mb-4">
+
+            <label for="id_receta" class="form-label fw-bold"> Seleccionar receta por ID: </label>
+
+            <form action="{{ url('/ajuste-ingredientes') }}" method="GET" class="d-flex align-items-center gap-2" style="max-width: 400px;">
+
+            <!-- boton de receta anterior -->
+            <a
+                href="{{ $id_anterior !== null ? url('/ajuste-ingredientes?id_receta='.$id_anterior) : '#' }}"
+                class="btn text-white fw-bold {{ $id_anterior === null ? 'disabled' : '' }}"
+                style="background-color: {{ $id_anterior === null ? '#adb5bd' : '#ffab76' }}; border-color: {{ $id_anterior === null ? '#adb5bd' : '#ffab76' }};"
+                >
+                &lt;
+            </a>
+
+            <!-- campo para ingresar id manualmente -->
+            <input
+                type="number"
+                id="id_receta"
+                name="id_receta"
+                min="1"
+                max="99999999999"
+                value="{{ $receta->id_receta }}"
+                class="form-control fw-bold text-center"
+                required
+            >
+
+            <!-- Boton de receta siguiente -->
+            <a
+                href="{{ $id_siguiente !== null ? url('/ajuste-ingredientes?id_receta='.$id_siguiente) : '#' }}"
+                class="btn text-white fw-bold {{ $id_siguiente === null ? 'disabled' : '' }}"
+                style="background-color: {{ $id_siguiente === null ? '#adb5bd' : '#ffab76' }}; border-color: {{ $id_siguiente === null ? '#adb5bd' : '#ffab76' }};"
+                >
+                &gt;
+            </a>
+
+            <!-- boton de busqueda -->
+            <button type="submit" class="btn text-white fw-bold" style="background-color: #ffab76; border-color: #ffab76;" > Buscar </button>
+        </form>
+    </div>
+
+
             <p class="text-muted fw-semibold">{{ $receta->descripcion_corta }}</p> {{-- párrafo --}}
 
             <hr class="my-4"> {{-- linea separadora --}}

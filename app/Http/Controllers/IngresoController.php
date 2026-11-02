@@ -1,101 +1,77 @@
 <?php
-namespace App\Http\Controllers; 
-use App\Models\Ingrediente;        //tabla ingrediente: crea el ingrediente o lo reutiliza si ya existe
-use App\Models\PasoPreparacion;    //tabla paso_preparacion: guarda cada paso con su numero (R1.12 y R1.18)
-use App\Models\Receta;             //tabla receta: revisa nombre repetido (R1.20), crea la receta y la carga en show()
-use App\Models\RecetaIngrediente;  //tabla receta_ingrediente: une la receta con cada ingrediente, con cantidad y unidad
-use App\Models\RecetaRegimen;      //tabla receta_regimen: guarda cada regimen marcado (R1.10 y R1.17)
-use Illuminate\Http\Request;       //trae todo lo que el usuario envio en el formulario ($request)
-use Illuminate\Support\Facades\DB; //consultas directas a la bd: DB::transaction (todo o nada) y DB::select (valoresDe)
-use Illuminate\Support\Str;        //ayudas para texto: Str::slug arma el nombre del link (R1.13) y Str::ascii compara sin tildes
-use Illuminate\Validation\Rule;    //reglas de validacion avanzadas: Rule::in revisa que el valor este en la lista de la bd
+namespace App\Http\Controllers;
+use App\Models\Ingrediente;
+use App\Models\PasoPreparacion;
+use App\Models\Receta;
+use App\Models\RecetaIngrediente;
+use App\Models\RecetaRegimen;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
-//funcion de ingreso de recetas (R.1)
+//funcion de ingreso de recetas
 class IngresoController extends Controller
 {
-
-    //R1.2: letras del español (con tildes y ñ), numeros, espacios, guion y coma
-    private const REGEX_NOMBRE = '/^[A-Za-zÁÉÍÓÚÜáéíóúüÑñ0-9,\- ]+$/u';
-
-    //R1.6, R1.9 y R1.10: lee desde la bd los valores permitidos de una columna de tipo lista, con una subconsulta
-    private function valoresDe($tabla, $columna)
+    //R1.6, R1.9 y R1.10: busca en la base de datos los valores de cada lista cerrada
+    private function valores_enum($tabla, $columna)
     {
-        return array_column(DB::select(
+        $filas = DB::select(
             "select enumlabel from pg_enum
             where enumtypid = (select atttypid from pg_attribute where attrelid = to_regclass(?) and attname = ?)
             order by enumsortorder",
             [$tabla, $columna]
-        ), 'enumlabel');
+        );
+        return array_column($filas, 'enumlabel');
     }
 
     //muestra el formulario
     public function create()
     {
         return view('ingreso_receta', [
-        'categorias' => $this->valoresDe('receta', 'categoria'),                    //R1.9 lista cerrada de categorias
-        'regimenes'  => $this->valoresDe('receta_regimen', 'regimen_alimenticio'),  //R1.10 lista cerrada de regimenes
-        'unidades'   => $this->valoresDe('receta_ingrediente', 'unidad_medida'),    //R1.6 lista cerrada de unidades de medida
+            'categorias' => $this->valores_enum('receta', 'categoria'),
+            'regimenes'  => $this->valores_enum('receta_regimen', 'regimen_alimenticio'),
+            'unidades'   => $this->valores_enum('receta_ingrediente', 'unidad_medida'),
         ]);
     }
 
     //guarda la receta cuando se presiona el boton
     public function store(Request $request)
     {
+        $categorias = $this->valores_enum('receta', 'categoria');
+        $regimenes = $this->valores_enum('receta_regimen', 'regimen_alimenticio');
+        $unidades = $this->valores_enum('receta_ingrediente', 'unidad_medida');
 
-        $categorias = $this->valoresDe('receta', 'categoria');
-        $regimenes  = $this->valoresDe('receta_regimen', 'regimen_alimenticio');
-        $unidades   = $this->valoresDe('receta_ingrediente', 'unidad_medida');
-        //R1.22: si algun campo no cumple, se detiene todo, se marca el campo con error y se muestra el mensaje (la receta no se guarda)
-        //R1.15: nombre y descripcion no pueden estar vacios ni solo con espacios (required los rechaza)
+        //R1.22 y Salida 2: si algun dato no cumple, no se guarda y se muestran los mensajes
+    
         $request->validate([
-            //R1.2 (largo 3 a 60 y caracteres permitidos), R1.15 (obligatorio) y R1.20 (nombre repetido)
-            //'bail' detiene la ejecución de validaciones para este campo al encontrar el primer error.
-            'nombre_receta' => ['bail', 'required', 'string', 'between:3,60', 'regex:' . self::REGEX_NOMBRE, 
-                //R1.20: revisa si ya existe otra receta con el mismo nombre, sin distinguir mayusculas ni tildes
-                //unaccent() sirve para ignorar tildes en la comparación.
-                function ($campo, $valor, $fail) {
-                    $existe = Receta::whereRaw('lower(unaccent(nombre_receta)) = lower(unaccent(?))', [$valor])->exists();
-                    if ($existe) {
-                        $fail("Ya existe una receta con este nombre. Ingrese un nombre distinto (por ejemplo, agregando un diferenciador como 'de la Abuela')");
-                    }
-                },
-            ],
-            //R1.3 (largo 10 a 150) y R1.15 (obligatorio)
+            //R1.2 y R1.15: nombre entre 3 y 60 caracteres, solo letras, numeros, espacios, guion y coma
+            'nombre_receta' => ['bail', 'required', 'string', 'between:3,60', 'regex:/^[A-Za-zÁÉÍÓÚÜáéíóúüÑñ0-9,\- ]+$/u'],
+            //R1.3 y R1.15: descripcion entre 10 y 150 caracteres
             'descripcion_corta' => ['bail', 'required', 'string', 'between:10,150'],
-            //R1.7 (archivo jpg, jpeg o png, maximo 5 MB, minimo 400x400), R1.15 (obligatorio) y R1.19 (si falta, mensaje propio)
+            //R1.7, R1.15 y R1.19: archivo jpg, jpeg o png, maximo 5 MB y minimo 150x150
             'imagen_referencial' => ['bail', 'required', 'file', 'mimes:jpg,jpeg,png', 'max:5120', 'dimensions:min_width=150,min_height=150'],
-            //R1.8 (entero entre 1 y 50) y R1.15 (obligatorio)
+            //R1.8 y R1.15: entero entre 1 y 50
             'cant_personas' => ['bail', 'required', 'integer', 'between:1,50'],
-            //R1.9 (lista cerrada), R1.17 (obligatoria y una sola opcion)
-            'categoria'  => ['bail', 'required', Rule::in($categorias)],
-            //R1.10 (lista cerrada) y R1.17 (obligatorio, una o mas opciones)
+            //R1.9 y R1.17: una sola categoria de la lista
+            'categoria' => ['bail', 'required', Rule::in($categorias)],
+            //R1.10 y R1.17: uno o mas regimenes de la lista
             'regimen' => ['bail', 'required', 'array'],
-            'regimen.*'  => [Rule::in($regimenes)],
-
+            'regimen.*' => [Rule::in($regimenes)],
             //R1.16: entre 1 y 50 ingredientes
-            'ingredientes' => ['bail', 'required', 'array', 'between:1,50',
-                //la tabla receta_ingrediente no permite el mismo ingrediente dos veces en una receta
-                function ($campo, $valor, $fail) {
-                    $nombres = [];
-                    foreach ((array) $valor as $ing) {
-                        $nombres[] = Str::lower(Str::ascii(trim(is_array($ing) ? ($ing['nombre'] ?? '') : '')));
-                    }
-                    if (count($nombres) !== count(array_unique($nombres))) {
-                        $fail('No puede repetir un ingrediente en la misma receta.');
-                    }
-                },
-            ],
-            //R1.4 (largo maximo 40) y R1.16 (obligatorio en cada ingrediente)
-            'ingredientes.*.nombre' => ['bail', 'required', 'string', 'max:40'],
-            //R1.5 (positivo, entre 0,01 y 10.000, maximo 2 decimales) y R1.16 (obligatorio)
+            'ingredientes' => ['bail', 'required', 'array', 'between:1,50'],
+            //R1.4 y R1.16: nombre del ingrediente entre 2 y 40 caracteres, solo letras, numeros, espacios, guion, punto y coma
+            'ingredientes.*.nombre' => ['bail', 'required', 'string', 'between:2,40', 'regex:/^[A-Za-zÁÉÍÓÚÜáéíóúüÑñ0-9 .,\-]+$/u'],
+            //R1.5 y R1.16: cantidad entre 0,01 y 10.000 con maximo 2 decimales
             'ingredientes.*.cantidad' => ['bail', 'required', 'numeric', 'between:0.01,10000', 'decimal:0,2'],
-            //R1.6 (lista cerrada) y R1.16 (obligatorio)
-            'ingredientes.*.unidad' => ['bail', 'required', Rule::in($unidades)],  
+            //R1.6 y R1.16: unidad de la lista
+            'ingredientes.*.unidad' => ['bail', 'required', Rule::in($unidades)],
             //R1.18: entre 1 y 30 pasos
             'pasos' => ['bail', 'required', 'array', 'between:1,30'],
-            //R1.11 (largo 5 a 300) y R1.18 (obligatorio en cada paso)
+            //R1.11 y R1.18: cada paso entre 5 y 300 caracteres
             'pasos.*' => ['bail', 'required', 'string', 'between:5,300'],
         ], [
+            //R1.22 y Salida 2: mensajes de error
             'nombre_receta.required' => 'El campo NOMBRE_RECETA es obligatorio.',
             'nombre_receta.between' => 'El campo NOMBRE_RECETA debe contener entre 3 y 60 caracteres.',
             'nombre_receta.regex' => 'El campo NOMBRE_RECETA solo admite letras, numeros, espacios, guion (-) y coma (,).',
@@ -125,7 +101,8 @@ class IngresoController extends Controller
             'ingredientes.between' => 'La receta debe tener entre 1 y 50 ingredientes.',
 
             'ingredientes.*.nombre.required' => 'El campo NOMBRE_INGREDIENTE es obligatorio.',
-            'ingredientes.*.nombre.max' => 'El campo NOMBRE_INGREDIENTE debe contener como maximo 40 caracteres.',
+            'ingredientes.*.nombre.between' => 'El campo NOMBRE_INGREDIENTE debe contener entre 2 y 40 caracteres.',
+            'ingredientes.*.nombre.regex' => 'El campo NOMBRE_INGREDIENTE solo admite letras, numeros, espacios, guion (-), punto (.) y coma (,).',
 
             'ingredientes.*.cantidad.required' => 'El campo CANTIDAD_INGREDIENTE es obligatorio.',
             'ingredientes.*.cantidad.numeric' => 'El valor de CANTIDAD_INGREDIENTE debe estar entre 0,01 y 10.000.',
@@ -142,13 +119,28 @@ class IngresoController extends Controller
             'pasos.*.between' => 'El campo DESCRIPCION_PASO debe contener entre 5 y 300 caracteres.',
         ]);
 
-        //R1.21: si todo cumple, se guarda la receta completa (si algo falla no se guarda nada)
+        //R1.20: no puede existir otra receta con el mismo nombre (sin contar mayusculas ni tildes)
+        $existe = Receta::whereRaw('lower(unaccent(nombre_receta)) = lower(unaccent(?))', [$request->nombre_receta])->exists();
+        if ($existe) {
+            return back()->withInput()->withErrors(['nombre_receta' => 'Ya existe una receta con este nombre. Ingrese un nombre distinto']);
+        }
+
+        //un ingrediente no se puede repetir dentro de la misma receta
+        $nombres = [];
+        foreach ($request->ingredientes as $ing) {
+            $nombres[] = mb_strtolower(trim($ing['nombre']));
+        }
+        if (count($nombres) != count(array_unique($nombres))) {
+            return back()->withInput()->withErrors(['ingredientes' => 'No puede repetir un ingrediente en la misma receta.']);
+        }
+
+        //R1.21: guarda la receta completa (si algo falla no se guarda nada)
         $receta = DB::transaction(function () use ($request) {
 
-            //R1.7: la imagen se guarda como archivo en storage/app/public/recetas y en la bd queda su ruta
+            //R1.7: la imagen se guarda en storage/app/public/recetas y en la bd queda su ruta
             $ruta = $request->file('imagen_referencial')->store('recetas', 'public');
 
-            //R1.14 y R1.21: no se envia id_receta, lo genera la bd con su secuencia y no se puede modificar
+            //R1.1 y R1.14: id_receta (entero positivo) no se envia, lo crea la bd y no se puede modificar
             $receta = Receta::create([
                 'nombre_receta'      => $request->nombre_receta,
                 'descripcion_corta'  => $request->descripcion_corta,
@@ -158,13 +150,12 @@ class IngresoController extends Controller
                 'categoria'          => $request->categoria,
             ]);
 
-            //R1.13 y R1.21: con el id ya creado se arma el link: empieza con https:// e incluye el nombre de la receta en la ruta
+            //R1.13: con el id ya creado se arma el link (https y con el nombre de la receta)
             $link = 'https://' . $request->getHttpHost() . '/receta/' . $receta->id_receta . '/' . Str::slug($request->nombre_receta);
             $receta->update(['link_receta' => $link]);
 
-            //R1.16: guarda los ingredientes (si el ingrediente ya existe lo reutiliza)
+            //R1.16: guarda los ingredientes (si ya existe el ingrediente lo reutiliza)
             foreach ($request->ingredientes as $ing) {
-                //firstOrCreate busca el registro y, de no existir, lo inserta automáticamente en un solo paso.
                 $ingrediente = Ingrediente::firstOrCreate(['nombre_ingrediente' => trim($ing['nombre'])]);
                 RecetaIngrediente::create([
                     'id_receta'            => $receta->id_receta,
@@ -174,7 +165,7 @@ class IngresoController extends Controller
                 ]);
             }
 
-            //R1.12 y R1.18: PASO_NUMERO lo asigna el sistema, correlativo desde 1 segun el orden ingresado
+            //R1.12 y R1.18: el numero de paso lo pone el sistema, desde 1
             foreach (array_values($request->pasos) as $i => $texto) {
                 PasoPreparacion::create([
                     'id_receta'        => $receta->id_receta,
@@ -183,7 +174,7 @@ class IngresoController extends Controller
                 ]);
             }
 
-            //R1.10 y R1.17: guarda los regimenes marcados
+            //R1.10: guarda los regimenes marcados
             foreach (array_unique($request->regimen) as $reg) {
                 RecetaRegimen::create(['id_receta' => $receta->id_receta, 'regimen_alimenticio' => $reg,]);
             }
@@ -191,15 +182,14 @@ class IngresoController extends Controller
             return $receta;
         });
 
-        //R1.21 y Salida 2: el mensaje de exito solo se muestra cuando la receta ya se guardo en la bd
+        //R1.21 y Salida 2: el mensaje de exito aparece solo despues de guardar en la bd
         return redirect()->route('receta.mostrar', ['id' => $receta->id_receta])->with('exito', 'Receta ingresada exitosamente');
     }
 
-    //R1.13 y Salida 1: pagina a la que apunta LINK_RECETA, muestra la informacion completa de la receta
+    //R1.13 y Salida 1: pagina a la que lleva el link, muestra la receta completa
     public function show($id, $slug = null)
     {
         $receta = Receta::with(['ingredientes.ingrediente', 'pasos', 'regimenes'])->findOrFail($id);
-
         return view('ver_receta', compact('receta'));
     }
 }

@@ -78,11 +78,8 @@
             <p class="mb-1"><span class="fw-bold">Cantidad de calificaciones:</span> {{ $receta->cantidad_calificaciones }}</p>
             <p class="mb-0">
                 <span class="fw-bold">Link:</span>
-                <a href="{{ route('recetas.mostrar', [
-                    'id_receta' => $receta->id_receta,
-                    'origen' => 'valorar',
-                    'id_usuario' => $idUsuario,
-                ]) }}" class="text-decoration-none fw-bold" style="color: #e88d51;">Ver detalle completo</a>
+                <a href="{{ route('receta.mostrar', ['id'=>$receta->id_receta])}}"
+                class="text-decoration-none fw-bold" style="color: #e88d51;">Ver detalle completo</a>
             </p>
 
             <hr class="my-4">

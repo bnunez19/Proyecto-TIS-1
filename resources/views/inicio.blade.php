@@ -63,18 +63,6 @@
                 </div>
             </div>
 
-            {{-- Opción Mostrar todas las recetas --}}
-            <div class="col-md-6">
-                <div class="card shadow-sm h-100 border-0">
-                    <div class="card-body d-flex flex-column justify-content-between text-center py-4">
-                        <h5 class="card-title h6 fw-bold text-secondary">Mostrar todas las recetas</h5>
-                        <form action="/lista" method="GET" class="mt-3">
-                            <button type="submit" class="btn btn-outline-pastel-naranja w-100">Mostar todas las recetas</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
             {{-- Opción Top 10 recetas --}}
             <div class="col-md-6">
                 <div class="card shadow-sm h-100 border-0">
@@ -93,6 +81,27 @@
                         <h5 class="card-title h6 fw-bold text-secondary">Valorar receta</h5>
                         <form action="/valorar" method="GET" class="mt-3">
                             <button type="submit" class="btn btn-outline-pastel-naranja w-100">Calificar Receta</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+             <div class="col-md-6">
+                <div class="card shadow-sm h-100 border-0">
+                    <div class="card-body d-flex flex-column justify-content-between text-center py-4">
+                        <h5 class="card-title h6 fw-bold text-secondary">Ajustar Ingrediente</h5>
+                        <form action="/ajuste-ingredientes" method="GET" class="mt-3">
+                            <button type="submit" class="btn btn-outline-pastel-naranja w-100">Ajustar ingredientes de receta</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+                        {{-- Opción Mostrar todas las recetas --}}
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100 border-0">
+                    <div class="card-body d-flex flex-column justify-content-between text-center py-4">
+                        <h5 class="card-title h6 fw-bold text-secondary">Mostrar todas las recetas</h5>
+                        <form action="/lista" method="GET" class="mt-3">
+                            <button type="submit" class="btn btn-outline-pastel-naranja w-100">Mostar todas las recetas</button>
                         </form>
                     </div>
                 </div>
