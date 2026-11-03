@@ -34,9 +34,6 @@
             </div>
         @endif
 
-        {{-- formulario: los datos se envian a la ruta ingreso.guardar y asi de esa forma la receta se guarda
-             enctype multipart: se usa para enviar la imagen como archivo (R1.7)
-             novalidate: los mensajes de error los entrega el sistema y no el navegador (R1.22) --}}
         <form method="POST" action="{{route('ingreso.guardar')}}" enctype="multipart/form-data" novalidate class="card shadow-sm p-4 mb-4 border-0">
             @csrf
 
@@ -54,7 +51,7 @@
                        class="form-control {{ $errors->has('descripcion_corta') ? 'rojo' : '' }}">
             </div>
 
-            {{-- R1.7, R1.15 y R1.19: la imagen es un archivo adjunto JPG, JPEG o PNG
+            {{-- R1.7, R1.15 y R1.19: la imagen es un archivo adjunto jpg, jpeg o png
                  (despues de un error hay que volver a elegirla, el navegador no la conserva) --}}
             <div class="mb-3">
                 <label for="imagen_referencial" class="form-label fw-bold">Imagen referencial (JPG o PNG):</label>
