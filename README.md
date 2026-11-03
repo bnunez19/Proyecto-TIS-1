@@ -63,21 +63,7 @@ Todos los comandos se ejecutan en la terminal de Laragon, dentro de la carpeta d
    ```bash
    php artisan key:generate
    ```
-
-7. **Crear el acceso público a las imágenes** (se hace una vez por computador):
-   ```bash
-   php artisan storage:link
-   ```
-   Si da un error de permisos, abrir la terminal como administrador y repetirlo.
-
-8. **Permitir imágenes de hasta 5 MB.** PHP limita las subidas a 2 MB por defecto. En el `php.ini` (en Laragon: clic derecho, PHP, php.ini) dejar:
-   ```ini
-   upload_max_filesize = 6M
-   post_max_size = 8M
-   ```
-   Después reiniciar Laragon o el servidor.
-
-9. **Iniciar el servidor:**
+7. **Iniciar el servidor:**
    ```bash
    php artisan serve
    ```
@@ -109,21 +95,6 @@ Otras rutas:
 | `/lista` | Lista de todas las recetas |
 | `/mostrar/{id}` | Detalle de una receta |
 | `/receta/{id}/{nombre}` | Página de la receta recién ingresada (la que abre `LINK_RECETA`) |
-
-## Estructura
-
-- `app/Models`: modelos Eloquent. Las tablas se crean directamente en PostgreSQL con el script, sin migraciones.
-- `app/Http/Controllers`: un controlador por requisito.
-- `resources/views`: vistas Blade.
-- `routes/web.php`: rutas de la aplicación.
-- `Base_de_datos/Recetario_base_de_datos.sql`: esquema y datos de prueba.
-- `storage/app/public/recetas`: imágenes de las recetas (ver más abajo).
-
-## Imágenes de las recetas
-
-La imagen de una receta se guarda como archivo en `storage/app/public/recetas`, y en la base queda solo su ruta. El comando `php artisan storage:link` la hace visible desde `public/storage/recetas`.
-
-Estas imágenes y la base de datos son locales a cada computador: no se suben a GitHub. Una receta ingresada en un equipo no aparece en otro, y su imagen tampoco.
 
 ## Solución de problemas
 
