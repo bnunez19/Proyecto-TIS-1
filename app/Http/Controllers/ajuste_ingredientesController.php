@@ -1,7 +1,9 @@
 <?php
-
+//Controlador para la vista ajuste_ingredientes.blade.php de la funcion 4 Ajuste de Ingredientes segun cantidad de personas
+//Responsable: Edinson Ramos
 namespace App\Http\Controllers;
 
+//necesarios para recibir datos y realizar llamados a la bd
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -9,12 +11,37 @@ class ajuste_ingredientesController extends Controller
 {
     public function ajuste_ingredientes(Request $request)
     {
-        //se obtienen todos los id y se ordenan de menor a mayor
+
+        // R4.3 ID_RECETA se utiliza para identificar la receta cuyos ingredientes se  desean ajustar. 
+        // El sistema revisa que corresponda a una receta existente; si no  la encuentra, selecciona el id más cercano, 
+        //si no encuentra nada, muestra el mensaje “No se ha encontrado ninguna receta”
         $ids_recetas = DB::table('receta')
             ->orderBy('id_receta')
             ->pluck('id_receta');
 
-        abort_if($ids_recetas->isEmpty(), 404, 'No se ha encontrado ninguna receta.');
+
+
+        if ($ids_recetas->isEmpty()){
+            $sin_recetas = true; //si no se obtiene ningun id hacemos que sin_recetas sea true para hacer un caso de excepción
+
+            //para algunos atributos entregamos un mensaje especial y para otros simplemente null
+            return view('ajuste_ingredientes', [
+                'sin_recetas' => true,
+                'receta' => (object)[
+
+                'id_receta' => null,
+                'nombre_receta' => 'No se ha encontrado ninguna receta.',
+                'descripcion_corta' => null,
+                'cant_personas' => null
+                ],
+                
+                'ingredientes' => null,
+                'pasos' => null,
+                'ids_recetas' => null,
+                'id_anterior' => null,
+                'id_siguiente' => null
+            ]   ); 
+        }
 
         //se obtiene el id que solicita el usuario o el primero si es que no ingresa nada
         $id_solicitado = $request->query('id_receta');
@@ -47,13 +74,14 @@ class ajuste_ingredientesController extends Controller
             }
         }
 
-        //obtención de datos
         $receta = DB::table('receta')         // obtenemos la receta y buscamos por el id seleccionado 
             ->where('id_receta', $id_receta) ->first();
 
         abort_if(!$receta, 404, 'Receta no encontrada.');
 
-        //obtenemos los ingredientes y sus cantidades
+        // R4.4 El sistema recupera de la base de datos CANT_PERSONAS (definida en  R1.8) 
+        //y la lista de INGREDIENTES de la receta, compuesta por  NOMBRE_INGREDIENTE (R1.4), CANTIDAD_INGREDIENTE (R1.5) ,  UNIDAD_MEDIDA (R1.6) de cada ingrediente 
+        //y tanto DESCRIPCIÓN_PASO (R1.11) como tambien PASO_NUMERO (R1.12).
         $ingredientes = DB::table('receta_ingrediente as ri')
             ->join( 'ingrediente as i', 'ri.id_ingrediente', '=', 'i.id_ingrediente')
             ->where('ri.id_receta', $id_receta)
@@ -81,6 +109,7 @@ class ajuste_ingredientesController extends Controller
 
         //enviamos los datos a la view ajuste_ingredientes.blade.php
         return view('ajuste_ingredientes', [
+            'sin_recetas' => false,
             'receta' => $receta,
             'ingredientes' => $ingredientes,
             'pasos' => $pasos,

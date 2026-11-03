@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+{{-- Vista para la función 1 Ingreso de Recetas --}}
+{{-- Responsable: Barbara Gonzalez --}}
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -25,7 +27,7 @@
     <main class="container py-4" style="max-width: 900px;">
         <h1 class="h3 mb-4 fw-bold">Ingresar receta</h1>
 
-        {{-- R1.22 y Salida 2: busca y muestra los mensajes de error (sin repetir los iguales) --}}
+        {{-- R1.22 y Salida 2: busca y muestra los mensajes de error --}}
         @if ($errors->any())
             <div class="alert alert-danger fw-bold" role="alert">
                 @foreach (collect($errors->all())->unique() as $error)
@@ -34,9 +36,6 @@
             </div>
         @endif
 
-        {{-- formulario: los datos se envian a la ruta ingreso.guardar y asi de esa forma la receta se guarda
-             enctype multipart: se usa para enviar la imagen como archivo (R1.7)
-             novalidate: los mensajes de error los entrega el sistema y no el navegador (R1.22) --}}
         <form method="POST" action="{{route('ingreso.guardar')}}" enctype="multipart/form-data" novalidate class="card shadow-sm p-4 mb-4 border-0">
             @csrf
 
@@ -54,22 +53,21 @@
                        class="form-control {{ $errors->has('descripcion_corta') ? 'rojo' : '' }}">
             </div>
 
-            {{-- R1.7, R1.15 y R1.19: la imagen es un archivo adjunto JPG, JPEG o PNG
-                 (despues de un error hay que volver a elegirla, el navegador no la conserva) --}}
+            {{-- R1.7, R1.15 y R1.19: la imagen es un archivo adjunto jpg, jpeg o png --}}
             <div class="mb-3">
                 <label for="imagen_referencial" class="form-label fw-bold">Imagen referencial (JPG o PNG):</label>
                 <input type="file" id="imagen_referencial" name="imagen_referencial" accept=".jpg,.jpeg,.png"
                        class="form-control {{ $errors->has('imagen_referencial') ? 'rojo' : '' }}">
             </div>
 
-            {{-- R1.8 y R1.15: cantidad de personas (min y max limitan la flecha del campo) --}}
+            {{-- R1.8 y R1.15: cantidad de personas --}}
             <div class="mb-3">
                 <label for="cant_personas" class="form-label fw-bold">Cantidad de personas:</label>
                 <input type="number" id="cant_personas" name="cant_personas" min="1" max="50" step="1" value="{{old('cant_personas')}}"
                        class="form-control {{ $errors->has('cant_personas') ? 'rojo' : '' }}">
             </div>
 
-            {{-- R1.9 y R1.17: categoria, lista cerrada de una sola opcion --}}
+            {{-- R1.9 y R1.17: categoria, lista de una sola opcion --}}
             <div class="mb-3">
                 <label for="categoria" class="form-label fw-bold">Categoría:</label>
                 <select id="categoria" name="categoria" class="form-select {{ $errors->has('categoria') ? 'rojo' : '' }}">
@@ -80,7 +78,7 @@
                 </select>
             </div>
 
-            {{-- R1.10 y R1.17: regimen alimenticio, lista cerrada de una o mas opciones --}}
+            {{-- R1.10 y R1.17: regimen alimenticio, lista de una o mas opciones --}}
             <div class="mb-3">
                 <label class="form-label d-block fw-bold">Régimen alimenticio:</label>
                 <div class="{{ $errors->has('regimen') ? 'p-2 border border-danger rounded' : '' }}">
@@ -135,12 +133,14 @@
                 @endforeach
             </ol>
             <button type="button" class="btn btn-outline-secondary btn-sm mb-4 fw-bold" onclick="agregarPaso()">Agregar paso</button>
-            <hr class="my-4">
-
+            <hr class="my-2">
             <button type="submit" class="btn btn-pastel-naranja w-100">Guardar receta</button>
+            <div class="my-3">
+                <a href="/" class="btn btn-outline-secondary fw-bold">Volver al inicio</a>
+            </div>
         </form>
 
-        {{-- moldes de las filas nuevas (NUEVO se reemplaza por un numero distinto en cada fila) --}}
+        {{-- plantilla de las filas nuevas --}}
         <template id="molde-ingrediente">
             <div class="input-group" data-fila>
                 <input type="text" name="ingredientes[NUEVO][nombre]" placeholder="Ingrediente" class="form-control">
@@ -167,7 +167,7 @@
         <script>
             var contador = 1000; //numero distinto para cada fila nueva de ingredientes
 
-            //R1.16: agrega una fila de ingrediente (maximo 50)
+            //R1.16: agrega una fila de ingrediente 
             function agregarIngrediente() {
                 var lista = document.getElementById('ingredientes');
                 if (lista.children.length >= 50) {
@@ -179,7 +179,7 @@
                 lista.insertAdjacentHTML('beforeend', fila);
             }
 
-            //R1.18: agrega un paso (maximo 30)
+            //R1.18: agrega un paso
             function agregarPaso() {
                 var lista = document.getElementById('pasos');
                 if (lista.children.length >= 30) {
@@ -189,7 +189,7 @@
                 lista.insertAdjacentHTML('beforeend', document.getElementById('molde-paso').innerHTML);
             }
 
-            //quita una fila, pero siempre deja al menos una (R1.16 y R1.18: minimo 1)
+            //quita una fila, pero siempre deja al menos una (R1.16 y R1.18)
             function quitarFila(boton, idLista) {
                 var lista = document.getElementById(idLista);
                 if (lista.children.length > 1) {

@@ -4,8 +4,10 @@ use App\Models\Receta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-
-//funcion de busqueda y filtro
+/*
+Controlador para la vista buscar.blade.php de la función 5 Busqueda y Filtrado de recetas
+Responsable: Leandro Torres
+*/
 class BusquedaController extends Controller
 {
     //R1.9 y R1.10: busca los valores de categoria y regimenes directamente de la base de datos y los guarda

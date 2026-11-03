@@ -1,58 +1,150 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Recetario de Cocina Digital
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Proyecto semestral TIS-1, Ingeniería Civil Informática, UCSC.
+Aplicación web hecha con Laravel y PostgreSQL para ingresar, buscar, valorar y consultar recetas de cocina de una familia.
 
-## About Laravel
+## Requisitos
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Laragon 8.7 o superior (incluye PHP, Composer y una terminal)
+- PHP 8.3 o superior, con las extensiones `pdo_pgsql` y `pgsql` activadas en el `php.ini`
+- Composer
+- PostgreSQL 14 o superior (probado con la 18) y pgAdmin
+- Navegador: Chrome 110+, Firefox 110+ o Safari 16+
+- Conexión a internet (Bootstrap y la fuente se cargan desde un CDN)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+El proyecto usa Laravel 13, que se instala con `composer install`.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Instalación
 
-## Learning Laravel
+Todos los comandos se ejecutan en la terminal de Laragon, dentro de la carpeta del proyecto.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. **Entrar a la carpeta e instalar las dependencias:**
+   ```bash
+   cd ruta\a\Proyecto-TIS-1
+   composer install
+   ```
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. **Crear la base de datos** en pgAdmin (o psql) con el nombre `Proyecto_TIS1`, respetando mayúsculas y minúsculas.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+3. **Importar el script con las tablas y los datos de prueba**, `Base_de_datos/Recetario_base_de_datos.sql`. Hay dos formas:
+   - En pgAdmin: clic derecho en `Proyecto_TIS1`, luego Query Tool, abrir el archivo y ejecutarlo.
+   - Con psql:
+     ```bash
+     psql -U postgres -d Proyecto_TIS1 -f Base_de_datos/Recetario_base_de_datos.sql
+     ```
 
-## Agentic Development
+   La búsqueda y el ingreso de recetas comparan nombres sin distinguir tildes, y para eso necesitan la extensión `unaccent`. Si el script no la crea, ejecutar en la base:
+   ```sql
+   CREATE EXTENSION IF NOT EXISTS unaccent;
+   ```
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+4. **Crear el archivo de configuración:**
+   ```bash
+   copy .env.example .env
+   ```
+   En Linux o macOS se usa `cp .env.example .env`.
+
+5. **Editar el `.env`** con los datos de tu PostgreSQL. Además de la conexión, hay que cambiar tres líneas, porque la base no tiene tablas de sesiones, caché ni colas:
+   ```env
+   DB_CONNECTION=pgsql
+   DB_HOST=127.0.0.1
+   DB_PORT=5432
+   DB_DATABASE=Proyecto_TIS1
+   DB_USERNAME=postgres
+   DB_PASSWORD=tu_contraseña
+
+   SESSION_DRIVER=file
+   CACHE_STORE=file
+   QUEUE_CONNECTION=sync
+   ```
+   El `.env` es personal de cada computador y no se sube a GitHub.
+
+6. **Generar la clave de la aplicación:**
+   ```bash
+   php artisan key:generate
+   ```
+
+7. **Crear el acceso público a las imágenes** (se hace una vez por computador):
+   ```bash
+   php artisan storage:link
+   ```
+   Si da un error de permisos, abrir la terminal como administrador y repetirlo.
+
+8. **Permitir imágenes de hasta 5 MB.** PHP limita las subidas a 2 MB por defecto. En el `php.ini` (en Laragon: clic derecho, PHP, php.ini) dejar:
+   ```ini
+   upload_max_filesize = 6M
+   post_max_size = 8M
+   ```
+   Después reiniciar Laragon o el servidor.
+
+9. **Iniciar el servidor:**
+   ```bash
+   php artisan serve
+   ```
+   Abrir http://127.0.0.1:8000
+
+### Comprobar que la conexión funciona
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+php artisan config:clear
+php artisan db:show
 ```
+Debe mostrar PostgreSQL, la base `Proyecto_TIS1` y sus tablas.
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## Funcionalidades
 
-## Contributing
+| Requisito | Responsable | Ruta | Controlador | Vista |
+|---|---|---|---|---|
+| R.1 Ingreso de recetas | Bárbara González | `/ingreso` | `IngresoController` | `Ingreso_receta` y `ver_receta` |
+| R.2 Valoración de recetas | Bastián Núñez | `/valorar` | `CalificacionController` | `valorar_receta` |
+| R.3 Recetas populares | Diego Burgos | `/top10` | `TopController` | `top10` |
+| R.4 Ajuste de ingredientes | Edinson Ramos | `/ajuste-ingredientes` | `ajuste_ingredientesController` | `ajuste_ingredientes` |
+| R.5 Búsqueda y filtrado | Leandro Torres | `/buscar` | `BusquedaController` | `buscar` |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Otras rutas:
 
-## Code of Conduct
+| Ruta | Descripción |
+|---|---|
+| `/` | Página de inicio |
+| `/lista` | Lista de todas las recetas |
+| `/mostrar/{id}` | Detalle de una receta |
+| `/receta/{id}/{nombre}` | Página de la receta recién ingresada (la que abre `LINK_RECETA`) |
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Estructura
 
-## Security Vulnerabilities
+- `app/Models`: modelos Eloquent. Las tablas se crean directamente en PostgreSQL con el script, sin migraciones.
+- `app/Http/Controllers`: un controlador por requisito.
+- `resources/views`: vistas Blade.
+- `routes/web.php`: rutas de la aplicación.
+- `Base_de_datos/Recetario_base_de_datos.sql`: esquema y datos de prueba.
+- `storage/app/public/recetas`: imágenes de las recetas (ver más abajo).
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Imágenes de las recetas
 
-## License
+La imagen de una receta se guarda como archivo en `storage/app/public/recetas`, y en la base queda solo su ruta. El comando `php artisan storage:link` la hace visible desde `public/storage/recetas`.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Estas imágenes y la base de datos son locales a cada computador: no se suben a GitHub. Una receta ingresada en un equipo no aparece en otro, y su imagen tampoco.
+
+## Solución de problemas
+
+| Mensaje o síntoma | Causa y solución |
+|---|---|
+| `No application encryption key has been specified` | Falta la clave: ejecutar `php artisan key:generate` |
+| `Database file at path [...database.sqlite] does not exist` | El `.env` sigue con SQLite: poner `DB_CONNECTION=pgsql` y quitar el `#` de las líneas `DB_` |
+| `could not find driver` | Activar `pdo_pgsql` y `pgsql` en el `php.ini` y reiniciar la terminal |
+| `la autentificación password falló` | `DB_PASSWORD` no es la contraseña de PostgreSQL de este computador |
+| `database "Proyecto_TIS1" does not exist` | Falta crear la base (paso 2) |
+| `relation "sessions" does not exist` | `SESSION_DRIVER`, `CACHE_STORE` y `QUEUE_CONNECTION` deben ser `file`, `file` y `sync` |
+| `function unaccent(...) does not exist` | Ejecutar `CREATE EXTENSION IF NOT EXISTS unaccent;` en la base |
+| La imagen de la receta aparece rota | Falta `php artisan storage:link`, o la receta se ingresó en otro computador |
+| Error al subir una imagen de más de 2 MB | Aumentar `upload_max_filesize` y `post_max_size` en el `php.ini` (paso 8) |
+| `Route [...] not defined` o una página no abre | Ejecutar `php artisan route:clear` y revisar `routes/web.php` |
+| La vista muestra algo antiguo | Ejecutar `php artisan view:clear` |
+
+## Integrantes
+
+- Diego Burgos
+- Bárbara González
+- Bastián Núñez
+- Edinson Ramos
+- Leandro Torres

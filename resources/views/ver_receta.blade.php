@@ -20,7 +20,7 @@
 </head>
 <body class="bg-light">
     <main class="container py-4" style="max-width: 800px;">
-        {{-- R1.21 y Salida 2: mensaje de exito (solo aparece despues de guardar en la bd) --}}
+        {{-- R1.21 y Salida 2: mensaje de exito --}}
         @if (session('exito'))
             <div class="alert alert-success fw-bold" role="alert">
                 {{session('exito')}}
@@ -28,7 +28,7 @@
         @endif
 
         <div class="card shadow-sm p-4 mb-4 border-0">
-            {{-- R1.13: esta pagina es la que abre LINK_RECETA (informacion completa de la receta) --}}
+            {{-- R1.13: esta pagina es la que abre LINK_RECETA --}}
             {{-- Salida 1: todos los datos de la receta y su ID_RECETA --}}
             <h1 class="h3 mb-2 fw-bold">{{$receta->nombre_receta}}</h1>
             <p class="text-muted small fw-bold">ID de la receta: {{$receta->id_receta}}</p>

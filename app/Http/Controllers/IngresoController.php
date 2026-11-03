@@ -10,7 +10,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
-//funcion de ingreso de recetas
+/*
+Controlador para la vista Ingreso_receta.blade.php de la función 1 Ingreso de Recetas 
+Responsable: Barbara Gonzalez
+*/
 class IngresoController extends Controller
 {
     //R1.6, R1.9 y R1.10: busca en la base de datos los valores de cada lista cerrada
@@ -28,7 +31,7 @@ class IngresoController extends Controller
     //muestra el formulario
     public function create()
     {
-        return view('ingreso_receta', [
+        return view('Ingreso_receta', [
             'categorias' => $this->valores_enum('receta', 'categoria'),
             'regimenes'  => $this->valores_enum('receta_regimen', 'regimen_alimenticio'),
             'unidades'   => $this->valores_enum('receta_ingrediente', 'unidad_medida'),
@@ -72,12 +75,12 @@ class IngresoController extends Controller
             'pasos.*' => ['bail', 'required', 'string', 'between:5,300'],
         ], [
             //R1.22 y Salida 2: mensajes de error
-            'nombre_receta.required' => 'El campo NOMBRE_RECETA es obligatorio.',
-            'nombre_receta.between' => 'El campo NOMBRE_RECETA debe contener entre 3 y 60 caracteres.',
-            'nombre_receta.regex' => 'El campo NOMBRE_RECETA solo admite letras, numeros, espacios, guion (-) y coma (,).',
+            'nombre_receta.required' => 'El campo nombre_receta es obligatorio.',
+            'nombre_receta.between' => 'El campo nombre_receta debe contener entre 3 y 60 caracteres.',
+            'nombre_receta.regex' => 'El campo nombre_receta solo admite letras, numeros, espacios, guion (-) y coma (,).',
 
-            'descripcion_corta.required' => 'El campo DESCRIPCION_CORTA es obligatorio.',
-            'descripcion_corta.between' => 'El campo DESCRIPCION_CORTA debe contener entre 10 y 150 caracteres.',
+            'descripcion_corta.required' => 'El campo descripcion_corta es obligatorio.',
+            'descripcion_corta.between' => 'El campo descripcion_corta debe contener entre 10 y 150 caracteres.',
 
             //R1.19: mensaje cuando no se adjunta la imagen
             'imagen_referencial.required' => 'Debe adjuntar una imagen referencial de la receta',
@@ -87,39 +90,39 @@ class IngresoController extends Controller
             'imagen_referencial.max' => 'El archivo adjunto no cumple con el formato o dimensiones requeridas.',
             'imagen_referencial.dimensions' => 'El archivo adjunto no cumple con el formato o dimensiones requeridas.',
 
-            'cant_personas.required' => 'El campo CANT_PERSONAS es obligatorio.',
-            'cant_personas.integer' => 'El valor de CANT_PERSONAS debe estar entre 1 y 50.',
-            'cant_personas.between' => 'El valor de CANT_PERSONAS debe estar entre 1 y 50.',
+            'cant_personas.required' => 'El campo cant_personas es obligatorio.',
+            'cant_personas.integer' => 'El valor de cant_personas debe estar entre 1 y 50.',
+            'cant_personas.between' => 'El valor de cant_personas debe estar entre 1 y 50.',
 
-            'categoria.required' => 'El campo CATEGORIA es obligatorio.',
-            'categoria.in' => 'El campo CATEGORIA tiene un valor no valido.',
+            'categoria.required' => 'El campo categoria es obligatorio.',
+            'categoria.in' => 'El campo categoria tiene un valor no valido.',
 
-            'regimen.required' => 'El campo REGIMEN_ALIMENTICIO es obligatorio.',
-            'regimen.*.in' => 'El campo REGIMEN_ALIMENTICIO tiene un valor no valido.',
+            'regimen.required' => 'El campo regimen_alimenticio es obligatorio.',
+            'regimen.*.in' => 'El campo regimen_alimenticio tiene un valor no valido.',
 
             'ingredientes.required' => 'La receta debe tener entre 1 y 50 ingredientes.',
             'ingredientes.between' => 'La receta debe tener entre 1 y 50 ingredientes.',
 
-            'ingredientes.*.nombre.required' => 'El campo NOMBRE_INGREDIENTE es obligatorio.',
-            'ingredientes.*.nombre.between' => 'El campo NOMBRE_INGREDIENTE debe contener entre 2 y 40 caracteres.',
-            'ingredientes.*.nombre.regex' => 'El campo NOMBRE_INGREDIENTE solo admite letras, numeros, espacios, guion (-), punto (.) y coma (,).',
+            'ingredientes.*.nombre.required' => 'El campo nombre_ingrediente es obligatorio.',
+            'ingredientes.*.nombre.between' => 'El campo nombre_ingrediente debe contener entre 2 y 40 caracteres.',
+            'ingredientes.*.nombre.regex' => 'El campo nombre_ingrediente solo admite letras, numeros, espacios, guion (-), punto (.) y coma (,).',
 
-            'ingredientes.*.cantidad.required' => 'El campo CANTIDAD_INGREDIENTE es obligatorio.',
-            'ingredientes.*.cantidad.numeric' => 'El valor de CANTIDAD_INGREDIENTE debe estar entre 0,01 y 10.000.',
-            'ingredientes.*.cantidad.between' => 'El valor de CANTIDAD_INGREDIENTE debe estar entre 0,01 y 10.000.',
-            'ingredientes.*.cantidad.decimal' => 'El valor de CANTIDAD_INGREDIENTE debe tener como maximo 2 decimales.',
+            'ingredientes.*.cantidad.required' => 'El campo cantidad_ingrediente es obligatorio.',
+            'ingredientes.*.cantidad.numeric' => 'El valor de cantidad_ingrediente debe estar entre 0,01 y 10.000.',
+            'ingredientes.*.cantidad.between' => 'El valor de cantidad_ingrediente debe estar entre 0,01 y 10.000.',
+            'ingredientes.*.cantidad.decimal' => 'El valor de cantidad_ingrediente debe tener como maximo 2 decimales.',
 
-            'ingredientes.*.unidad.required' => 'El campo UNIDAD_MEDIDA es obligatorio.',
-            'ingredientes.*.unidad.in' => 'El campo UNIDAD_MEDIDA tiene un valor no valido.',
+            'ingredientes.*.unidad.required' => 'El campo unidad_medida es obligatorio.',
+            'ingredientes.*.unidad.in' => 'El campo unidad_medida tiene un valor no valido.',
 
             'pasos.required' => 'La receta debe tener entre 1 y 30 pasos de preparacion.',
             'pasos.between' => 'La receta debe tener entre 1 y 30 pasos de preparacion.',
 
-            'pasos.*.required' => 'El campo DESCRIPCION_PASO es obligatorio.',
-            'pasos.*.between' => 'El campo DESCRIPCION_PASO debe contener entre 5 y 300 caracteres.',
+            'pasos.*.required' => 'El campo descripcion_paso es obligatorio.',
+            'pasos.*.between' => 'El campo descripcion_paso debe contener entre 5 y 300 caracteres.',
         ]);
 
-        //R1.20: no puede existir otra receta con el mismo nombre (sin contar mayusculas ni tildes)
+        //R1.20: no puede existir otra receta con el mismo nombre
         $existe = Receta::whereRaw('lower(unaccent(nombre_receta)) = lower(unaccent(?))', [$request->nombre_receta])->exists();
         if ($existe) {
             return back()->withInput()->withErrors(['nombre_receta' => 'Ya existe una receta con este nombre. Ingrese un nombre distinto']);
@@ -134,7 +137,7 @@ class IngresoController extends Controller
             return back()->withInput()->withErrors(['ingredientes' => 'No puede repetir un ingrediente en la misma receta.']);
         }
 
-        //R1.21: guarda la receta completa (si algo falla no se guarda nada)
+        //R1.21: guarda la receta completa
         $receta = DB::transaction(function () use ($request) {
 
             //R1.7: la imagen se guarda en storage/app/public/recetas y en la bd queda su ruta
@@ -150,8 +153,8 @@ class IngresoController extends Controller
                 'categoria'          => $request->categoria,
             ]);
 
-            //R1.13: con el id ya creado se arma el link (https y con el nombre de la receta)
-            $link = 'https://' . $request->getHttpHost() . '/receta/' . $receta->id_receta . '/' . Str::slug($request->nombre_receta);
+            //R1.13: con el id ya creado se arma el link (http y con el nombre de la receta)
+            $link = 'http://' . $request->getHttpHost() . '/receta/' . $receta->id_receta . '/' . Str::slug($request->nombre_receta);
             $receta->update(['link_receta' => $link]);
 
             //R1.16: guarda los ingredientes (si ya existe el ingrediente lo reutiliza)

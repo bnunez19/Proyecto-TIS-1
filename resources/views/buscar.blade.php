@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+{{-- Vista para la función 5 Busqueda y Filtrado de recetas --}}
+{{-- Responsable: Leandro Torres --}}
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -75,7 +77,9 @@
                         <button type="submit" class="btn btn-pastel-naranja">Buscar</button>
                         <a href="{{route('buscar')}}" class="btn btn-outline-secondary fw-bold">Limpiar</a>
                     </div>
-
+                    <div>
+                        <a href="/" class="btn btn-outline-secondary fw-bold">Volver al inicio</a>
+                    </div>
                 </div>
             </div>
         </form>
@@ -116,7 +120,7 @@
                             </p>
 
                             <p class="mb-0">
-                                <span class="fw-bold">Link:</span> <a href="/receta/{{ $r->id_receta }}" class="text-decoration-none fw-bold" style="color: #e88d51;">{{ $r->nombre_receta }}</a>
+                                <a href="{{ $r->link_receta }}" class="text-decoration-none fw-bold" style="color: #e88d51;">{{ $r->nombre_receta }}</a></p>
                             </p>
                         </div>
                     </div>

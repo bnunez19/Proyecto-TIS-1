@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+{{-- Vista para la función 2 Valoracion de recetas --}}
+{{-- Responsable: Bastián Núñez --}}
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -77,9 +79,10 @@
             <p class="mb-1"><span class="fw-bold">Promedio de calificación:</span> {{ $receta->cantidad_calificaciones > 0 ? number_format($receta->promedio_calificacion, 1) : 'Sin calificaciones' }}</p>
             <p class="mb-1"><span class="fw-bold">Cantidad de calificaciones:</span> {{ $receta->cantidad_calificaciones }}</p>
             <p class="mb-0">
+                <p class="mb-0">
                 <span class="fw-bold">Link:</span>
-                <a href="{{ route('receta.mostrar', ['id'=>$receta->id_receta])}}"
-                class="text-decoration-none fw-bold" style="color: #e88d51;">Ver detalle completo</a>
+                <a href="{{ $receta->link_receta }}" class="text-decoration-none fw-bold" style="color: #e88d51;">{{ $receta->nombre_receta }}</a></p>
+                </p>
             </p>
 
             <hr class="my-4">
