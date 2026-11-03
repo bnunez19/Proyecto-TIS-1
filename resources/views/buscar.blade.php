@@ -116,7 +116,7 @@
                             </p>
 
                             <p class="mb-0">
-                                <span class="fw-bold">Link:</span> <a href="/receta/{{ $r->id_receta }}" class="text-decoration-none fw-bold" style="color: #e88d51;">{{ $r->nombre_receta }}</a>
+                                <a href="{{ parse_url($r->link_receta, PHP_URL_PATH) }}" class="text-decoration-none fw-bold" style="color: #e88d51;">{{ $r->nombre_receta }}</a>
                             </p>
                         </div>
                     </div>

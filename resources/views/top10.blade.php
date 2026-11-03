@@ -60,12 +60,17 @@
                         <p class="mb-1"><strong class="fw-bold">Descripcion corta:</strong> {{ $r->descripcion_corta }}</p>
                         <p class="mb-1"><strong class="fw-bold">Promedio:</strong> {{ $r->promedio_calificacion}}</p>
                         <p class="mb-1"><strong class="fw-bold">Cantidad:</strong> {{ $r->cantidad_calificaciones }}</p>
-                        <p class="mb-1"><strong class="fw-bold">Link:</strong> <a href="/receta/{{ $r->id_receta }}" class="text-decoration-none fw-bold" style="color: #e88d51;">{{ $r->nombre_receta }}</a>
+                        <p class="mb-1"><strong class="fw-bold">Link:</strong> <a href="{{ parse_url($r->link_receta, PHP_URL_PATH) }}">{{ $r->nombre_receta }}</a>
                         <p class="mb-0"><strong class="fw-bold">Regimen alimenticio:</strong> 
                             @foreach ($r->regimenes as $reg)
                                 {{ $reg->regimen_alimenticio }}@if (!$loop->last), @endif <!-- $loop->last evita dejar una coma sobrante al final.-->
                             @endforeach
                         </p>
+                        @if($r->imagen_referencial)
+                        <p class="text-center">
+                            <img src="{{asset('storage/' . $r->imagen_referencial)}}" alt="Imagen de la receta" class="img-fluid rounded shadow-sm" width="300">
+                        </p>
+                        @endif
                     </div>
                 </div>
             @endif

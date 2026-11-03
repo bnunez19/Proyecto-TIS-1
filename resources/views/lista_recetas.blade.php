@@ -28,7 +28,7 @@
             <ul class="list-group list-group-flush mb-3">
                 @foreach ($recetas as $r)
                     <li class="list-group-item px-0">
-                        <a href="/receta/{{ $r->id_receta }}" class="text-decoration-none fw-bold" style="color: #e88d51;">{{ $r->nombre_receta }}</a>
+                        <a href="{{ parse_url($r->link_receta, PHP_URL_PATH) }}" class="list-group-item list-group-item-action">
                     </li>
                 @endforeach
             </ul>

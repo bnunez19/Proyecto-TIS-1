@@ -15,14 +15,14 @@ class RecetaController extends Controller
     public function mostrar_lista_recetas()
     {
         $recetas = Receta::orderBy('nombre_receta') -> get();
-        return view('recetas.lista_recetas', compact('recetas'));
+        return view('lista_recetas', compact('recetas'));
 
     }
 
     public function mostrar_receta($id_receta)
     {
         $recetas = Receta::with('regimenes') ->findOrFail($id_receta); //busca el autor con ese id. Si no existe, Laravel muestra automáticamente una página de error 404, en vez de romperse.
-        return view('recetas.mostrar', compact('recetas'));
+        return view('ver_receta', compact('recetas'));
     }
 
 

@@ -9,7 +9,7 @@ use App\Http\Controllers\CalificacionController;
 
 Route::get('/', [RecetaController::class, 'inicio']); 
 Route::get('/lista', [RecetaController::class, 'mostrar_lista_recetas']); 
-Route::get('/mostrar/{id_receta}', [RecetaController::class, 'mostrar_receta']); 
+Route::get('/receta/{id}/{slug?}', [RecetaController::class, 'show'])->whereNumber('id')->name('receta.mostrar');
 
 Route::get('/top10', [TopController::class, 'top10']);
 

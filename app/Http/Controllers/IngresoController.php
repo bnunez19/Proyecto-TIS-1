@@ -119,7 +119,7 @@ class IngresoController extends Controller
             'pasos.*.between' => 'El campo DESCRIPCION_PASO debe contener entre 5 y 300 caracteres.',
         ]);
 
-        //R1.20: no puede existir otra receta con el mismo nombre (sin contar mayusculas ni tildes)
+        //R1.20: no puede existir otra receta con el mismo nombre
         $existe = Receta::whereRaw('lower(unaccent(nombre_receta)) = lower(unaccent(?))', [$request->nombre_receta])->exists();
         if ($existe) {
             return back()->withInput()->withErrors(['nombre_receta' => 'Ya existe una receta con este nombre. Ingrese un nombre distinto']);
@@ -134,7 +134,7 @@ class IngresoController extends Controller
             return back()->withInput()->withErrors(['ingredientes' => 'No puede repetir un ingrediente en la misma receta.']);
         }
 
-        //R1.21: guarda la receta completa (si algo falla no se guarda nada)
+        //R1.21: guarda la receta completa
         $receta = DB::transaction(function () use ($request) {
 
             //R1.7: la imagen se guarda en storage/app/public/recetas y en la bd queda su ruta
@@ -150,8 +150,8 @@ class IngresoController extends Controller
                 'categoria'          => $request->categoria,
             ]);
 
-            //R1.13: con el id ya creado se arma el link (https y con el nombre de la receta)
-            $link = 'https://' . $request->getHttpHost() . '/receta/' . $receta->id_receta . '/' . Str::slug($request->nombre_receta);
+            //R1.13: con el id ya creado se arma el link (http y con el nombre de la receta)
+            $link = 'http://' . $request->getHttpHost() . '/receta/' . $receta->id_receta . '/' . Str::slug($request->nombre_receta);
             $receta->update(['link_receta' => $link]);
 
             //R1.16: guarda los ingredientes (si ya existe el ingrediente lo reutiliza)
