@@ -144,10 +144,7 @@
                     // R4.6 El sistema calcula la CANTIDAD_AJUSTADA multiplicando la CANTIDAD_INGREDIENTE original por el FACTOR_AJUSTE. 
                     // El resultado se redondea a un maximo de 2 decimales
 
-                    // R4.7 Si CANT_PERSONAS_DESEADA es igual a la CANT_PERSONAS  original, el FACTOR_AJUSTE es 1 y el sistema muestra las cantidades  originales sin cambios 
-                    // junto con su respectivo NOMBRE_INGREDIENTE y UNIDAD_MEDIDA para cada ingrediente.
-
-                    //R4.8: El ajuste es solo visual y temporal. No modifica los valores de  CANT_PERSONAS ni de CANTIDAD_INGREDIENTE guardados en la receta  original
+                    //R4.7: El ajuste es solo visual y temporal. No modifica los valores de  CANT_PERSONAS ni de CANTIDAD_INGREDIENTE guardados en la receta  original
 
                     elemento.textContent = Number(cantidadNueva.toFixed(2)).toLocaleString('es-CL', {maximumFractionDigits: 2}); //reemplazamos la cantidad con la nueva cantidad redondeada
                     //es-CL es la convencion chilena para mostrar los decimales con coma en vez de punto
