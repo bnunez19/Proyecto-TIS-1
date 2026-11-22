@@ -48,30 +48,30 @@ class IngresoController extends Controller
         //R1.22 y Salida 2: si algun dato no cumple, no se guarda y se muestran los mensajes
     
         $request->validate([
-            //R1.2 y R1.15: nombre entre 3 y 60 caracteres, solo letras, numeros, espacios, guion y coma
+            //R1.2 y R1.14: nombre entre 3 y 60 caracteres, solo letras, numeros, espacios, guion y coma
             'nombre_receta' => ['bail', 'required', 'string', 'between:3,60', 'regex:/^[A-Za-zÁÉÍÓÚÜáéíóúüÑñ0-9,\- ]+$/u'],
-            //R1.3 y R1.15: descripcion entre 10 y 150 caracteres
+            //R1.3 y R1.14: descripcion entre 10 y 150 caracteres
             'descripcion_corta' => ['bail', 'required', 'string', 'between:10,150'],
-            //R1.7, R1.15 y R1.19: archivo jpg, jpeg o png, maximo 5 MB y minimo 150x150
+            //R1.7, R1.14 y R1.19: archivo jpg, jpeg o png, maximo 5 MB y minimo 150x150
             'imagen_referencial' => ['bail', 'required', 'file', 'mimes:jpg,jpeg,png', 'max:5120', 'dimensions:min_width=150,min_height=150'],
-            //R1.8 y R1.15: entero entre 1 y 50
+            //R1.8 y R1.14: entero entre 1 y 50
             'cant_personas' => ['bail', 'required', 'integer', 'between:1,50'],
-            //R1.9 y R1.17: una sola categoria de la lista
+            //R1.9 y R1.16: una sola categoria de la lista
             'categoria' => ['bail', 'required', Rule::in($categorias)],
-            //R1.10 y R1.17: uno o mas regimenes de la lista
+            //R1.10 y R1.16: uno o mas regimenes de la lista
             'regimen' => ['bail', 'required', 'array'],
             'regimen.*' => [Rule::in($regimenes)],
-            //R1.16: entre 1 y 50 ingredientes
+            //R1.15: entre 1 y 50 ingredientes
             'ingredientes' => ['bail', 'required', 'array', 'between:1,50'],
-            //R1.4 y R1.16: nombre del ingrediente entre 2 y 40 caracteres, solo letras, numeros, espacios, guion, punto y coma
+            //R1.4 y R1.15: nombre del ingrediente entre 2 y 40 caracteres, solo letras, numeros, espacios, guion, punto y coma
             'ingredientes.*.nombre' => ['bail', 'required', 'string', 'between:2,40', 'regex:/^[A-Za-zÁÉÍÓÚÜáéíóúüÑñ0-9 .,\-]+$/u'],
-            //R1.5 y R1.16: cantidad entre 0,01 y 10.000 con maximo 2 decimales
+            //R1.5 y R1.15: cantidad entre 0,01 y 10.000 con maximo 2 decimales
             'ingredientes.*.cantidad' => ['bail', 'required', 'numeric', 'between:0.01,10000', 'decimal:0,2'],
-            //R1.6 y R1.16: unidad de la lista
+            //R1.6 y R1.15: unidad de la lista
             'ingredientes.*.unidad' => ['bail', 'required', Rule::in($unidades)],
-            //R1.18: entre 1 y 30 pasos
+            //R1.17: entre 1 y 30 pasos
             'pasos' => ['bail', 'required', 'array', 'between:1,30'],
-            //R1.11 y R1.18: cada paso entre 5 y 300 caracteres
+            //R1.11 y R1.17: cada paso entre 5 y 300 caracteres
             'pasos.*' => ['bail', 'required', 'string', 'between:5,300'],
         ], [
             //R1.22 y Salida 2: mensajes de error
@@ -143,7 +143,7 @@ class IngresoController extends Controller
             //R1.7: la imagen se guarda en storage/app/public/recetas y en la bd queda su ruta
             $ruta = $request->file('imagen_referencial')->store('recetas', 'public');
 
-            //R1.1 y R1.14: id_receta (entero positivo) no se envia, lo crea la bd y no se puede modificar
+            //R1.1 y R1.18: id_receta (entero positivo) no se envia, lo crea la bd y no se puede modificar
             $receta = Receta::create([
                 'nombre_receta'      => $request->nombre_receta,
                 'descripcion_corta'  => $request->descripcion_corta,
@@ -157,7 +157,7 @@ class IngresoController extends Controller
             $link = 'http://' . $request->getHttpHost() . '/receta/' . $receta->id_receta . '/' . Str::slug($request->nombre_receta);
             $receta->update(['link_receta' => $link]);
 
-            //R1.16: guarda los ingredientes (si ya existe el ingrediente lo reutiliza)
+            //R1.15: guarda los ingredientes (si ya existe el ingrediente lo reutiliza)
             foreach ($request->ingredientes as $ing) {
                 $ingrediente = Ingrediente::firstOrCreate(['nombre_ingrediente' => trim($ing['nombre'])]);
                 RecetaIngrediente::create([
@@ -168,7 +168,7 @@ class IngresoController extends Controller
                 ]);
             }
 
-            //R1.12 y R1.18: el numero de paso lo pone el sistema, desde 1
+            //R1.12 y R1.17: el numero de paso lo pone el sistema, desde 1
             foreach (array_values($request->pasos) as $i => $texto) {
                 PasoPreparacion::create([
                     'id_receta'        => $receta->id_receta,

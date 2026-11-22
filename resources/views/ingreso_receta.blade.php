@@ -39,35 +39,35 @@
         <form method="POST" action="{{route('ingreso.guardar')}}" enctype="multipart/form-data" novalidate class="card shadow-sm p-4 mb-4 border-0">
             @csrf
 
-            {{-- R1.2 y R1.15: nombre de la receta --}}
+            {{-- R1.2 y R1.14: nombre de la receta --}}
             <div class="mb-3">
                 <label for="nombre_receta" class="form-label fw-bold">Nombre de la receta:</label>
                 <input type="text" id="nombre_receta" name="nombre_receta" value="{{old('nombre_receta')}}"
                        class="form-control {{ $errors->has('nombre_receta') ? 'rojo' : '' }}">
             </div>
 
-            {{-- R1.3 y R1.15: descripcion corta --}}
+            {{-- R1.3 y R1.14: descripcion corta --}}
             <div class="mb-3">
                 <label for="descripcion_corta" class="form-label fw-bold">Descripción corta:</label>
                 <input type="text" id="descripcion_corta" name="descripcion_corta" value="{{old('descripcion_corta')}}"
                        class="form-control {{ $errors->has('descripcion_corta') ? 'rojo' : '' }}">
             </div>
 
-            {{-- R1.7, R1.15 y R1.19: la imagen es un archivo adjunto jpg, jpeg o png --}}
+            {{-- R1.7, R1.14 y R1.19: la imagen es un archivo adjunto jpg, jpeg o png --}}
             <div class="mb-3">
                 <label for="imagen_referencial" class="form-label fw-bold">Imagen referencial (JPG o PNG):</label>
                 <input type="file" id="imagen_referencial" name="imagen_referencial" accept=".jpg,.jpeg,.png"
                        class="form-control {{ $errors->has('imagen_referencial') ? 'rojo' : '' }}">
             </div>
 
-            {{-- R1.8 y R1.15: cantidad de personas --}}
+            {{-- R1.8 y R1.14: cantidad de personas --}}
             <div class="mb-3">
                 <label for="cant_personas" class="form-label fw-bold">Cantidad de personas:</label>
                 <input type="number" id="cant_personas" name="cant_personas" min="1" max="50" step="1" value="{{old('cant_personas')}}"
                        class="form-control {{ $errors->has('cant_personas') ? 'rojo' : '' }}">
             </div>
 
-            {{-- R1.9 y R1.17: categoria, lista de una sola opcion --}}
+            {{-- R1.9 y R1.16: categoria, lista de una sola opcion --}}
             <div class="mb-3">
                 <label for="categoria" class="form-label fw-bold">Categoría:</label>
                 <select id="categoria" name="categoria" class="form-select {{ $errors->has('categoria') ? 'rojo' : '' }}">
@@ -78,7 +78,7 @@
                 </select>
             </div>
 
-            {{-- R1.10 y R1.17: regimen alimenticio, lista de una o mas opciones --}}
+            {{-- R1.10 y R1.16: regimen alimenticio, lista de una o mas opciones --}}
             <div class="mb-3">
                 <label class="form-label d-block fw-bold">Régimen alimenticio:</label>
                 <div class="{{ $errors->has('regimen') ? 'p-2 border border-danger rounded' : '' }}">
@@ -93,7 +93,7 @@
             </div>
             <hr class="my-4">
 
-            {{-- R1.16: de 1 a 50 ingredientes. Cada uno con nombre (R1.4), cantidad (R1.5) y unidad (R1.6) --}}
+            {{-- R1.15: de 1 a 50 ingredientes. Cada uno con nombre (R1.4), cantidad (R1.5) y unidad (R1.6) --}}
             <h3 class="h5 mb-3 fw-bold">Ingredientes</h3>
             <div id="ingredientes" class="vstack gap-2 mb-3">
                 @php $filasIng = old('ingredientes', [['nombre' => '', 'cantidad' => '', 'unidad' => '']]); @endphp
@@ -118,7 +118,7 @@
             <button type="button" class="btn btn-outline-secondary btn-sm mb-4 fw-bold" onclick="agregarIngrediente()">Agregar ingrediente</button>
             <hr class="my-4">
 
-            {{-- R1.18: de 1 a 30 pasos. La lista numerada pone el numero sola
+            {{-- R1.17: de 1 a 30 pasos. La lista numerada pone el numero sola
                  (R1.12: guarda PASO_NUMERO correlativo desde 1) --}}
             <h3 class="h5 mb-3 fw-bold">Pasos de preparación</h3>
             <ol id="pasos" class="ps-4 mb-3">
@@ -167,7 +167,7 @@
         <script>
             var contador = 1000; //numero distinto para cada fila nueva de ingredientes
 
-            //R1.16: agrega una fila de ingrediente 
+            //R1.15: agrega una fila de ingrediente 
             function agregarIngrediente() {
                 var lista = document.getElementById('ingredientes');
                 if (lista.children.length >= 50) {
@@ -179,7 +179,7 @@
                 lista.insertAdjacentHTML('beforeend', fila);
             }
 
-            //R1.18: agrega un paso
+            //R1.17: agrega un paso
             function agregarPaso() {
                 var lista = document.getElementById('pasos');
                 if (lista.children.length >= 30) {
@@ -189,7 +189,7 @@
                 lista.insertAdjacentHTML('beforeend', document.getElementById('molde-paso').innerHTML);
             }
 
-            //quita una fila, pero siempre deja al menos una (R1.16 y R1.18)
+            //quita una fila, pero siempre deja al menos una (R1.15 y R1.17)
             function quitarFila(boton, idLista) {
                 var lista = document.getElementById(idLista);
                 if (lista.children.length > 1) {
