@@ -80,7 +80,7 @@ class ajuste_ingredientesController extends Controller
         abort_if(!$receta, 404, 'Receta no encontrada.');
 
         // R4.4 El sistema recupera de la base de datos CANT_PERSONAS (definida en  R1.8) 
-        //y la lista de INGREDIENTES de la receta, compuesta por  NOMBRE_INGREDIENTE (R1.4), CANTIDAD_INGREDIENTE (R1.5) ,  UNIDAD_MEDIDA (R1.6) de cada ingrediente 
+        //y la lista de INGREDIENTES de la receta utilizando ID_INGREDIENTE, cuya lista está compuesta por  NOMBRE_INGREDIENTE (R1.4), CANTIDAD_INGREDIENTE (R1.5) ,  UNIDAD_MEDIDA (R1.6) de cada ingrediente 
         //y tanto DESCRIPCIÓN_PASO (R1.11) como tambien PASO_NUMERO (R1.12).
         $ingredientes = DB::table('receta_ingrediente as ri')
             ->join( 'ingrediente as i', 'ri.id_ingrediente', '=', 'i.id_ingrediente')
